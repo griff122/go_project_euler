@@ -10,46 +10,48 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math"
+	"time"
 )
 
-func isPrime(num int) bool {
+func sieveOfEratosthenes(n int) []int {
 	/*
-	   Function isPrime
-	     Return true or false if the number is prime
-	   args:
-	     num (int) - The number to test if it is prime
-	   returns:
-	     (boolean)
+		Function sieveOfEratosthenes
+			Get the list of primes through sieve of eratosthenes algorithm.
+		args:
+			n (int) - The max number to find primes for
+		returns:
+			([]int) - A list of primes
 	*/
-	output := true
-	if num%2 == 0 {
-		output = false
+	fmt.Println("Launching sieve function...")
+	s1 := time.Now()
+	fmt.Println("Starting initial array creation.")
+	totalNum := int(math.Ceil(math.Sqrt(float64(n)))) + 1
+	vals := make([]int, totalNum/2)
+	primes := []int{2}
+	counter := 0
+	for i := 3; i <= totalNum; i += 2 {
+		vals[counter] = i
+		counter++
 	}
-	for i := 3; i < num/2; i += 2 {
-		if num%i == 0 {
-			output = false
-			break
+	fmt.Printf(" -- Array initialization took: %s\n", time.Since(s1))
+	// now need to parse through the values and remove all elements that are
+	fmt.Println("Starting sieve.")
+	s2 := time.Now()
+	for len(vals) > 1 {
+		currPrime := vals[0]
+		primes = append(primes, currPrime)
+		vals = append(vals[:0], vals[1:]...)
+		for i := len(vals) - 1; i >= 0; i-- {
+			val := vals[i]
+			if val%currPrime == 0 {
+				vals = append(vals[:i], vals[i+1:]...)
+			}
 		}
 	}
-	return output
-}
-
-func getPrimeNumberSequence(maxNum int) []int {
-	/*
-	   Function getPrimeNumberSequence
-	     Get an array of prime numbers up to a specified value.
-	   args:
-	     maxNum (int) - The maximum int to find primes up to.
-	   returns:
-	     output ([]int) - An array of prime numbers
-	*/
-	output := []int{}
-	for i := 1; i <= maxNum; i += 2 {
-		if isPrime(i) {
-			output = append(output, i)
-		}
-	}
-	return output
+	fmt.Printf(" -- Sieve took: %s\n", time.Since(s2))
+	fmt.Printf("Total time for sieve function: %s\n", time.Since(s1))
+	return primes
 }
 
 func getLargestPrimeFactor(num int) int {
@@ -62,9 +64,13 @@ func getLargestPrimeFactor(num int) int {
 	     (int) - The largest prime factor
 	*/
 	largestPrime := -1
-	for _, val := range getPrimeNumberSequence(num) {
-		if num%val == 0 && val > largestPrime {
-			largestPrime = val
+
+	primes := sieveOfEratosthenes(num)
+
+	for i := len(primes) - 1; i >= 0; i-- {
+		if num%primes[i] == 0 {
+			largestPrime = primes[i]
+			break
 		}
 	}
 	return largestPrime
@@ -75,8 +81,7 @@ func main() {
 	flag.IntVar(&num, "n", 81, "Number to get largest prime factor for.")
 	flag.Parse()
 
-	//fmt.Println(getPrimeNumberSequence(num))
-	//fmt.Println(isPrime(9))
 	largestPrimeFactor := getLargestPrimeFactor(num)
+
 	fmt.Printf("The largest prime factor for %d:\n%d\n", num, largestPrimeFactor)
 }
