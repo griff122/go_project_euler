@@ -1,8 +1,7 @@
 /*
 Problem 3: Find largest prime factor
-TODO: TOO SLOW. Update the script to work backwards from num/2
-      Once a number is ID'd as a prime, and it is a factor,
-      then that is our answer
+Implemented a sieveOfEratosthenes to speed up calculations to 1 minutes for
+	finding the largest prime of 600851475143
 */
 
 package main
